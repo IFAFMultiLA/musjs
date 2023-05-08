@@ -32,6 +32,7 @@
 		this.finishedAt = 0;
 		this.timePoint = false;
 		this.recordCurrentElem = false;
+		this.curElemXPath = null;
 		this.recording = false;
 		this.playing = false;
 		this.playbackSpeed = this.speed.NORMAL;
@@ -75,7 +76,9 @@
 				if (callback) {
 					let record = ['m', e.clientX, e.clientY];
 					if (self.recordCurrentElem) {
-						record.push(self.getXpathFromElement(e.target));
+						var xpath = self.getXpathFromElement(e.target);
+						record.push(self.curElemXPath === xpath ? null : xpath);
+						self.curElemXPath = xpath;
 					}
 					callback(record);
 				}
@@ -93,7 +96,9 @@
 				if (callback) {
 					let record = ['c', e.clientX, e.clientY];
 					if (self.recordCurrentElem) {
-						record.push(self.getXpathFromElement(e.target));
+						var xpath = self.getXpathFromElement(e.target);
+						record.push(self.curElemXPath === xpath ? null : xpath);
+						self.curElemXPath = xpath;
 					}
 					callback(record);
 				}
