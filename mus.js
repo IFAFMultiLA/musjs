@@ -31,6 +31,7 @@
 		this.startedAt = 0;
 		this.finishedAt = 0;
 		this.timePoint = false;
+		this.recordCurrentElem = false;
 		this.recording = false;
 		this.playing = false;
 		this.playbackSpeed = this.speed.NORMAL;
@@ -69,8 +70,15 @@
 		 * @return function the mouse move listener
 		 */
 		moveListener: function (callback) {
+			var self = this;
 			return function (e) {
-				if (callback) callback(['m', e.clientX, e.clientY]);
+				if (callback) {
+					let record = ['m', e.clientX, e.clientY];
+					if (self.recordCurrentElem) {
+						record.push(self.getXpathFromElement(e.target));
+					}
+					callback(record);
+				}
 			}
 		},
 
@@ -80,8 +88,15 @@
 		 * @return function the mouse click listener
 		 */
 		clickListener: function (callback) {
+			var self = this;
 			return function (e) {
-				if (callback) callback(['c', e.clientX, e.clientY]);
+				if (callback) {
+					let record = ['c', e.clientX, e.clientY];
+					if (self.recordCurrentElem) {
+						record.push(self.getXpathFromElement(e.target));
+					}
+					callback(record);
+				}
 			}
 		},
 
@@ -529,6 +544,15 @@
 		 */
 		setTimePoint: function (timePoint) {
 			this.timePoint = timePoint;
+		},
+		
+
+		/**
+		 * Sets point time recording for accurate data
+		 * @param 
+		 */
+		setRecordCurrentElem: function (recordCurrentElem) {
+			this.recordCurrentElem = recordCurrentElem;
 		},
 
 		/**

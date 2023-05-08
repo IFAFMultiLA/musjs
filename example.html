@@ -63,6 +63,7 @@
 					<button onclick="mus.setPlaybackSpeed(mus.speed.FAST);">Fast</button>
 					<br/>
 					<button id="timePoint" onclick="setTimePoint();">Enable time point</button>
+					<button id="recordCurrentElem" onclick="setRecordCurrentElem();">Enable recording current element</button>
 					<br/>
 					<button onclick="releaseMus();">Release</button>
 				</td>
@@ -112,6 +113,15 @@
 					document.getElementById("timePoint").innerHTML = "Disable time point";
 				} else {
 					document.getElementById("timePoint").innerHTML = "Enable time point";
+				}
+			};
+			var setRecordCurrentElem = function() {
+				releaseMus();
+				mus.setRecordCurrentElem(!mus.recordCurrentElem);
+				if (mus.recordCurrentElem) {
+					document.getElementById("recordCurrentElem").innerHTML = "Disable recording current element";
+				} else {
+					document.getElementById("recordCurrentElem").innerHTML = "Enable recording current";
 				}
 			};
 			var setConsoleData = function() {
