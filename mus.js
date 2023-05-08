@@ -31,6 +31,7 @@
 		this.startedAt = 0;
 		this.finishedAt = 0;
 		this.timePoint = false;
+		this.recordInputs = true;
 		this.recordCurrentElem = false;
 		this.curElemXPath = null;
 		this.recording = false;
@@ -175,29 +176,31 @@
 			}
 
 			//Sets initial value of inputs
-			document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
-				
-				if (self.timePoint) {
-					self.frames.push(['i', self.getXpathFromElement(element), element.value, 0]);
-				} else {
-					self.frames.push(['i', self.getXpathFromElement(element), element.value]);
-				}
-				
-			});
-			document.querySelectorAll('select, input[type=checkbox], input[type=radio], input[type=color], input[type=date], input[type=file], input[type=number], input[type=range], input[type=time]').forEach(element => {
-				if (self.timePoint) {
-					if (element.type == 'checkbox' || element.type == 'radio')
-						self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked, 0]);
-					else
-						self.frames.push(['o', self.getXpathFromElement(element), element.value, 0]);
-				} else {
-					if (element.type == 'checkbox' || element.type == 'radio')
-						self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked]);
-					else
-						self.frames.push(['o', self.getXpathFromElement(element), element.value]);
-				}
+			if (self.recordInputs) {
+				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
+					
+					if (self.timePoint) {
+						self.frames.push(['i', self.getXpathFromElement(element), element.value, 0]);
+					} else {
+						self.frames.push(['i', self.getXpathFromElement(element), element.value]);
+					}
+					
+				});
+				document.querySelectorAll('select, input[type=checkbox], input[type=radio], input[type=color], input[type=date], input[type=file], input[type=number], input[type=range], input[type=time]').forEach(element => {
+					if (self.timePoint) {
+						if (element.type == 'checkbox' || element.type == 'radio')
+							self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked, 0]);
+						else
+							self.frames.push(['o', self.getXpathFromElement(element), element.value, 0]);
+					} else {
+						if (element.type == 'checkbox' || element.type == 'radio')
+							self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked]);
+						else
+							self.frames.push(['o', self.getXpathFromElement(element), element.value]);
+					}
 
-			});
+				});
+			}
 
 
 			// SET INITIAL VALUES END HERE
@@ -215,49 +218,52 @@
 				self.frames.push(self.timePoint ? scroll.concat(new Date().getTime() - (self.startedAt * 1000)) : scroll);
 				if (onFrame instanceof Function) onFrame();
 			});
-			document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
-				element.oninput = this.inputWithUserKeyListener(function (input) {
-					console.log(input)
-					self.frames.push(self.timePoint ? input.concat(new Date().getTime() - (self.startedAt * 1000)) : input);
-					if (onFrame instanceof Function) onFrame();
-				});
-			});
-
-			document.querySelectorAll('select, input[type=checkbox], input[type=radio], input[type=color], input[type=date], input[type=file], input[type=number], input[type=range], input[type=time]').forEach(element => {
-				element.onchange = this.inputWithOnchangeListener(function (inputonchange) {
-					let element = self.getElementByXpath(inputonchange[1]);
-					if (element.type == 'checkbox' || element.type == 'radio') {
-						inputonchange = inputonchange.concat(element.checked);
-						self.frames.push(self.timePoint ? inputonchange.concat(new Date().getTime() - (self.startedAt * 1000)) : inputonchange);
-					} else
-						self.frames.push(self.timePoint ? inputonchange.concat(new Date().getTime() - (self.startedAt * 1000)) : inputonchange);
-
-					if (onFrame instanceof Function) onFrame();
-				});
-			});
-
-			//Define mutation observer here
-			const targetNode = document.querySelector('body');
-			const config = { attributes: true, attributeOldValue: true, subtree: true };
-
-			var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-			this.observer = new MutationObserver(this.mutationObserver(function (mutations) {
-				for (let mutation of mutations) {
-					if (mutation.type == 'attributes') {
-						var mutationFrame = [];
-						if (mutation.target.hasAttribute(mutation.attributeName)) {
-							mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.target.getAttribute(mutation.attributeName), mutation.oldValue, 'M'];
-						}
-						else {
-							mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.oldValue, 'D'];
-						}
-
-						self.frames.push(self.timePoint ? mutationFrame.concat(new Date().getTime() - (self.startedAt * 1000)) : mutationFrame);
+			
+			if (self.recordInputs) {
+				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
+					element.oninput = this.inputWithUserKeyListener(function (input) {
+						console.log(input)
+						self.frames.push(self.timePoint ? input.concat(new Date().getTime() - (self.startedAt * 1000)) : input);
 						if (onFrame instanceof Function) onFrame();
+					});
+				});
+
+				document.querySelectorAll('select, input[type=checkbox], input[type=radio], input[type=color], input[type=date], input[type=file], input[type=number], input[type=range], input[type=time]').forEach(element => {
+					element.onchange = this.inputWithOnchangeListener(function (inputonchange) {
+						let element = self.getElementByXpath(inputonchange[1]);
+						if (element.type == 'checkbox' || element.type == 'radio') {
+							inputonchange = inputonchange.concat(element.checked);
+							self.frames.push(self.timePoint ? inputonchange.concat(new Date().getTime() - (self.startedAt * 1000)) : inputonchange);
+						} else
+							self.frames.push(self.timePoint ? inputonchange.concat(new Date().getTime() - (self.startedAt * 1000)) : inputonchange);
+
+						if (onFrame instanceof Function) onFrame();
+					});
+				});
+
+				//Define mutation observer here
+				const targetNode = document.querySelector('body');
+				const config = { attributes: true, attributeOldValue: true, subtree: true };
+
+				var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+				this.observer = new MutationObserver(this.mutationObserver(function (mutations) {
+					for (let mutation of mutations) {
+						if (mutation.type == 'attributes') {
+							var mutationFrame = [];
+							if (mutation.target.hasAttribute(mutation.attributeName)) {
+								mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.target.getAttribute(mutation.attributeName), mutation.oldValue, 'M'];
+							}
+							else {
+								mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.oldValue, 'D'];
+							}
+
+							self.frames.push(self.timePoint ? mutationFrame.concat(new Date().getTime() - (self.startedAt * 1000)) : mutationFrame);
+							if (onFrame instanceof Function) onFrame();
+						}
 					}
-				}
-			}));
-			this.observer.observe(targetNode, config);
+				}));
+				this.observer.observe(targetNode, config);
+			}
 
 			// Sets our recording flag
 			self.recording = true;
@@ -549,6 +555,15 @@
 		 */
 		setTimePoint: function (timePoint) {
 			this.timePoint = timePoint;
+		},
+		
+		
+		/**
+		 * Sets point time recording for accurate data
+		 * @param 
+		 */
+		setRecordInputs: function (recordInputs) {
+			this.recordInputs = recordInputs;
 		},
 		
 
