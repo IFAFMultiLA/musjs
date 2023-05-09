@@ -97,9 +97,7 @@
 				if (callback) {
 					let record = ['c', e.clientX, e.clientY];
 					if (self.recordCurrentElem) {
-						var xpath = self.getXpathFromElement(e.target);
-						record.push(self.curElemXPath === xpath ? null : xpath);
-						self.curElemXPath = xpath;
+						record.push(self.getXpathFromElement(e.target));
 					}
 					callback(record);
 				}

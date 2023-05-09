@@ -1,3 +1,10 @@
+UGLIFYJS := node_modules/.bin/uglifyjs
+OUTPUTJS := dist/mus.min.js
+INSTALLDIR := ../adaptivelearnr/inst/rmarkdown/templates/tutorial/resources/
+
 mini:
-	node_modules/.bin/uglifyjs mus.js -cm -o dist/mus.min.js
+	$(UGLIFYJS) mus.js -cm -o $(OUTPUTJS)
+
+install: $(OUTPUTJS)
+	cp $(OUTPUTJS) $(INSTALLDIR)
 
