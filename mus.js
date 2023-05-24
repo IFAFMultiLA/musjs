@@ -124,7 +124,6 @@
 		inputWithUserKeyListener: function (callback) {
 			var self = this;
 			return function (e) {
-				console.log(e)
 				if (callback) callback(['i', self.getXpathFromElement(e.target), e.target.value]);
 			}
 		},
@@ -220,7 +219,6 @@
 			if (self.recordInputs) {
 				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
 					element.oninput = this.inputWithUserKeyListener(function (input) {
-						console.log(input)
 						self.frames.push(self.timePoint ? input.concat(new Date().getTime() - (self.startedAt * 1000)) : input);
 						if (onFrame instanceof Function) onFrame();
 					});
