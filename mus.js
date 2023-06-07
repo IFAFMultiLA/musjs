@@ -350,38 +350,41 @@
 		 * Play a specific frame from playback
 		 */
 		playFrame: function (self, frame, node) {
+			try {
+				if (frame[0] == 'm') {
+					node.style.left = self.getXCoordinate(frame[1]) + "px";
+					node.style.top = self.getYCoordinate(frame[2]) + "px";
 
-			if (frame[0] == 'm') {
-				node.style.left = self.getXCoordinate(frame[1]) + "px";
-				node.style.top = self.getYCoordinate(frame[2]) + "px";
+				} else if (frame[0] == 'c') {
+					self.createClickSnapshot(frame[2], frame[1]);
 
-			} else if (frame[0] == 'c') {
-				self.createClickSnapshot(frame[2], frame[1]);
+				} else if (frame[0] == 's') {
+					window.scrollTo(frame[1], frame[2]);
 
-			} else if (frame[0] == 's') {
-				window.scrollTo(frame[1], frame[2]);
-
-			} else if (frame[0] == 'i') {
-				let element = self.getElementByXpath(frame[1]);
-				element.value = frame[2];
-
-			} else if (frame[0] == 'o') {
-				let element = self.getElementByXpath(frame[1]);
-				if (element.type == 'checkbox' || element.type == 'radio') {
-					element.checked = frame[3];
-				}
-				else {
+				} else if (frame[0] == 'i') {
+					let element = self.getElementByXpath(frame[1]);
 					element.value = frame[2];
-				}
-			} else if (frame[0] == 'a') {
-				let element = self.getElementByXpath(frame[1]);
-				if (frame[5] == 'M') {
-					element.setAttribute(frame[2], frame[3]);
-				} else if (frame[4] == 'D') {
-					element.removeAttribute(frame[2]);
-				}
+
+				} else if (frame[0] == 'o') {
+					let element = self.getElementByXpath(frame[1]);
+					if (element.type == 'checkbox' || element.type == 'radio') {
+						element.checked = frame[3];
+					}
+					else {
+						element.value = frame[2];
+					}
+				} else if (frame[0] == 'a') {
+					let element = self.getElementByXpath(frame[1]);
+					if (frame[5] == 'M') {
+						element.setAttribute(frame[2], frame[3]);
+					} else if (frame[4] == 'D') {
+						element.removeAttribute(frame[2]);
+					}
 
 
+				}
+			} catch (err) {
+				// ignore
 			}
 		},
 
