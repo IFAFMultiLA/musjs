@@ -357,7 +357,8 @@
 
 				} else if (frame[0] == 'c') {
 					self.createClickSnapshot(frame[2], frame[1]);
-
+					let element = self.getElementByXpath(frame[3]);
+					element.click();
 				} else if (frame[0] == 's') {
 					window.scrollTo(frame[1], frame[2]);
 
