@@ -352,8 +352,11 @@
 		playFrame: function (self, frame, node) {
 			try {
 				if (frame[0] == 'm') {
-					node.style.left = self.getXCoordinate(frame[1]) + "px";
-					node.style.top = self.getYCoordinate(frame[2]) + "px";
+					let xoffset = 100;
+					let left = document.scrollingElement.scrollLeft;
+					let top = document.scrollingElement.scrollTop;
+					node.style.left = (left + xoffset + self.getXCoordinate(frame[1])) + "px";
+					node.style.top = (top + self.getYCoordinate(frame[2])) + "px";
 
 				} else if (frame[0] == 'c') {
 					self.createClickSnapshot(frame[2], frame[1]);
@@ -415,11 +418,11 @@
 			if (!document.getElementById("musCursor")) {
 				var node = document.createElement("div");
 				node.id = "musCursor";
-				node.style.position = "fixed";
+				node.style.position = "absolute";
 				node.style.width = "32px";
 				node.style.height = "32px";
-				node.style.top = "-100%";
-				node.style.left = "-100%";
+				//node.style.top = "-100%";
+				//node.style.left = "-100%";
 				node.style.borderRadius = "32px";
 				node.style.backgroundImage = "url(" + cursorIcon + ")";
 				document.body.appendChild(node);
