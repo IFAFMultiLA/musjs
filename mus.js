@@ -34,6 +34,7 @@
 		this.recordInputs = true;
 		this.recordCurrentElem = false;
 		this.curElemXPath = null;
+		this.curElemCSSPath = null;
 		this.recording = false;
 		this.playing = false;
 		this.playbackSpeed = this.speed.NORMAL;
@@ -79,7 +80,10 @@
 					if (self.recordCurrentElem) {
 						var xpath = self.getXpathFromElement(e.target);
 						record.push(self.curElemXPath === xpath ? null : xpath);
+						var csspath = self.getCSSPath(e.target);
+						record.push(self.curElemCSSPath === csspath ? null : csspath);
 						self.curElemXPath = xpath;
+						self.curElemCSSPath = csspath;
 					}
 					callback(record);
 				}
@@ -98,6 +102,7 @@
 					let record = ['c', e.clientX, e.clientY];
 					if (self.recordCurrentElem) {
 						record.push(self.getXpathFromElement(e.target));
+						record.push(self.getCSSPath(e.target));
 					}
 					callback(record);
 				}
@@ -124,7 +129,7 @@
 		inputWithUserKeyListener: function (callback) {
 			var self = this;
 			return function (e) {
-				if (callback) callback(['i', self.getXpathFromElement(e.target), e.target.value]);
+				if (callback) callback(['i', self.getXpathFromElement(e.target), self.getCSSPath(e.target), e.target.value]);
 			}
 		},
 
@@ -137,7 +142,7 @@
 		inputWithOnchangeListener: function (callback) {
 			var self = this;
 			return function (e) {
-				if (callback) callback(['o', self.getXpathFromElement(e.target), e.target.value]);
+				if (callback) callback(['o', self.getXpathFromElement(e.target), self.getCSSPath(e.target), e.target.value]);
 			}
 		},
 
@@ -177,23 +182,23 @@
 				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
 					
 					if (self.timePoint) {
-						self.frames.push(['i', self.getXpathFromElement(element), element.value, 0]);
+						self.frames.push(['i', self.getXpathFromElement(element), self.getCSSPath(element), element.value, 0]);
 					} else {
-						self.frames.push(['i', self.getXpathFromElement(element), element.value]);
+						self.frames.push(['i', self.getXpathFromElement(element), self.getCSSPath(element), element.value]);
 					}
 					
 				});
 				document.querySelectorAll('select, input[type=checkbox], input[type=radio], input[type=color], input[type=date], input[type=file], input[type=number], input[type=range], input[type=time]').forEach(element => {
 					if (self.timePoint) {
 						if (element.type == 'checkbox' || element.type == 'radio')
-							self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked, 0]);
+							self.frames.push(['o', self.getXpathFromElement(element), self.getCSSPath(element), element.value, element.checked, 0]);
 						else
-							self.frames.push(['o', self.getXpathFromElement(element), element.value, 0]);
+							self.frames.push(['o', self.getXpathFromElement(element), self.getCSSPath(element), element.value, 0]);
 					} else {
 						if (element.type == 'checkbox' || element.type == 'radio')
-							self.frames.push(['o', self.getXpathFromElement(element), element.value, element.checked]);
+							self.frames.push(['o', self.getXpathFromElement(element), self.getCSSPath(element), element.value, element.checked]);
 						else
-							self.frames.push(['o', self.getXpathFromElement(element), element.value]);
+							self.frames.push(['o', self.getXpathFromElement(element), self.getCSSPath(element), element.value]);
 					}
 
 				});
@@ -247,10 +252,10 @@
 						if (mutation.type == 'attributes') {
 							var mutationFrame = [];
 							if (mutation.target.hasAttribute(mutation.attributeName)) {
-								mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.target.getAttribute(mutation.attributeName), mutation.oldValue, 'M'];
+								mutationFrame = ['a', self.getXpathFromElement(mutation.target), self.getCSSPath(mutation.target), mutation.attributeName, mutation.target.getAttribute(mutation.attributeName), mutation.oldValue, 'M'];
 							}
 							else {
-								mutationFrame = ['a', self.getXpathFromElement(mutation.target), mutation.attributeName, mutation.oldValue, 'D'];
+								mutationFrame = ['a', self.getXpathFromElement(mutation.target), self.getCSSPath(mutation.target), mutation.attributeName, mutation.oldValue, 'D'];
 							}
 
 							self.frames.push(self.timePoint ? mutationFrame.concat(new Date().getTime() - (self.startedAt * 1000)) : mutationFrame);
@@ -367,22 +372,22 @@
 
 				} else if (frame[0] == 'i') {
 					let element = self.getElementByXpath(frame[1]);
-					element.value = frame[2];
+					element.value = frame[3];
 
 				} else if (frame[0] == 'o') {
 					let element = self.getElementByXpath(frame[1]);
 					if (element.type == 'checkbox' || element.type == 'radio') {
-						element.checked = frame[3];
+						element.checked = frame[4];
 					}
 					else {
-						element.value = frame[2];
+						element.value = frame[3];
 					}
 				} else if (frame[0] == 'a') {
 					let element = self.getElementByXpath(frame[1]);
-					if (frame[5] == 'M') {
-						element.setAttribute(frame[2], frame[3]);
-					} else if (frame[4] == 'D') {
-						element.removeAttribute(frame[2]);
+					if (frame[6] == 'M') {
+						element.setAttribute(frame[3], frame[4]);
+					} else if (frame[5] == 'D') {
+						element.removeAttribute(frame[3]);
 					}
 
 
@@ -600,6 +605,32 @@
 			SLOW: 35,
 			NORMAL: 15,
 			FAST: 5
+		},
+		
+		/**
+		 * Function to get CSS selector that uniquely identifies `el`.
+		 *
+		 * Taken from https://stackoverflow.com/a/57257763.
+		 */
+		getCSSPath: function(el) {
+		    let rendered_path_parts = [];
+
+		    $( el ).parents().addBack().each((i, el) => {
+			const $el = $( el );
+			let current_el_path = $el.prop('tagName').toLowerCase();
+
+			if ($el.attr('id')) {
+			    current_el_path += '#' + $el.attr('id');
+			}
+
+			if ($el.attr('class')) {
+			    current_el_path += '.' + $el.attr('class').split(' ').join('.');
+			}
+
+			rendered_path_parts.push( current_el_path );
+		    })
+
+		    return rendered_path_parts.join(' ');
 		},
 
 		getXpathFromElement: function (elm) {
