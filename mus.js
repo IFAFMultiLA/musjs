@@ -39,6 +39,7 @@
 		this.playing = false;
 		this.playbackSpeed = this.speed.NORMAL;
 		this.observer = '';
+		this.curWindowResizeEventListener = null;
 		this.window = {
 			width: window.outerWidth,
 			height: window.outerHeight
@@ -66,6 +67,21 @@
 	Mus.prototype = {
 
 		/** Mus Listeners **/
+		
+		/**
+		 * Listener intended to be used with window 'resize' event
+		 * @param callback function a callback fnc
+		 * @return function the window resize event listener
+		 */
+		windowResizeListener: function (callback) {
+			var self = this;
+			return function (e) {
+				if (callback) {
+					let record = ['w', window.innerWidth, window.innerHeight];
+					callback(record);
+				}
+			}
+		},
 
 		/**
 		 * Listener intended to be used with onmousemove
@@ -208,6 +224,13 @@
 			// SET INITIAL VALUES END HERE
 
 			// Defines Mus listeners on window
+			this.curWindowResizeEventListener = this.windowResizeListener(function (record) {
+				self.frames.push(self.timePoint ? record.concat(new Date().getTime() - (self.startedAt * 1000)) : record);
+				if (onFrame instanceof Function) onFrame();
+			});
+			window.addEventListener('resize', this.curWindowResizeEventListener, true);
+			
+			
 			window.onmousemove = this.moveListener(function (pos) {
 				self.frames.push(self.timePoint ? pos.concat(new Date().getTime() - (self.startedAt * 1000)) : pos);
 				if (onFrame instanceof Function) onFrame();
@@ -275,6 +298,8 @@
 		 */
 		stop: function () {
 			this.finishedAt = new Date().getTime() / 1000;
+			window.removeEventListener('resize', this.curWindowResizeEventListener);
+			this.curWindowResizeEventListener = null;
 			window.onmousemove = this.onmousemove;
 			window.onmousedown = this.onmousedown;
 			window.onscroll = this.onscroll;
