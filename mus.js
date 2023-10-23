@@ -50,7 +50,7 @@
 		this.onmousedown = window.onmousedown;
 		this.onscroll = window.onscroll;
 		this.inputWithUserKeyEvent = () => {
-			document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
+			document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
 				element.onkeydown = null;
 			});
 		};
@@ -195,7 +195,7 @@
 
 			//Sets initial value of inputs
 			if (self.recordInputs) {
-				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
+				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
 					
 					if (self.timePoint) {
 						self.frames.push(['i', self.getXpathFromElement(element), self.getCSSPath(element), element.value, 0]);
@@ -245,7 +245,7 @@
 			});
 			
 			if (self.recordInputs) {
-				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=password], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
+				document.querySelectorAll('textarea, input[type=text], input[type=email], input[type=number], input[type=tel], input[type=search], input[type=url], input[type=search], input[type=week], input[type=month], input[type=datetime-local]').forEach(element => {
 					element.oninput = this.inputWithUserKeyListener(function (input) {
 						self.frames.push(self.timePoint ? input.concat(new Date().getTime() - (self.startedAt * 1000)) : input);
 						if (onFrame instanceof Function) onFrame();
