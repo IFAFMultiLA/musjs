@@ -29,6 +29,7 @@
 		this.pos = 0;
 		this.currPos = 0;
 		this.startedAt = 0;
+		this.startedAtISODate = null;
 		this.finishedAt = 0;
 		this.timePoint = false;
 		this.recordInputs = true;
@@ -184,7 +185,11 @@
 			if (this.recording) return;
 
 			var self = this;
-			if (self.startedAt == 0) self.startedAt = new Date().getTime() / 1000;
+			if (self.startedAt == 0) {
+				let now = new Date();
+				self.startedAt = now.getTime() / 1000;
+				self.startedAtISODate = now.toISOString();
+			}
 
 			// Sets initial scroll position of the window
 			if (self.timePoint) {
@@ -368,6 +373,7 @@
 		release: function () {
 			this.frames = [];
 			this.startedAt = 0;
+			this.startedAtISODate = null;
 			this.finishedAt = 0;
 			this.stop();
 			this.destroyCursor();
@@ -536,6 +542,7 @@
 		getData: function () {
 			return {
 				frames: this.frames,
+				startedAtISODate: this.startedAtISODate,
 				timeElapsed: this.timeElapsed(),
 				window: {
 					width: window.outerWidth,
