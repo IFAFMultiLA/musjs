@@ -403,8 +403,6 @@
 
 				} else if (frame[0] == 'S') {   // content scoll
 					let element = document.querySelector('div.parallellayout.col.main');
-					console.log(frame);
-					console.log(element);
 					element.scrollTo(frame[1], frame[2]);
 				} else if (frame[0] == 'i') {
 					let element = self.getElementByXpath(frame[1]);
