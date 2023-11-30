@@ -341,11 +341,17 @@
 
 			var node = document.getElementById("musCursor");
 			var delay = '';
+			var startDelay = 0;
+			var startPos = self.pos;
+			if (startPos > 0) {  // subtract this delay in realtime playback as these frames were played before a pause
+				startDelay = self.frames[startPos][self.frames[startPos].length - 1];
+			}
+			
 			for (; self.pos < self.frames.length; self.pos++) {
 				if(self.timePoint){
-					delay = self.frames[self.pos][self.frames[self.pos].length - 1];
+					delay = self.frames[self.pos][self.frames[self.pos].length - 1] - startDelay;
 				}else{
-					delay = self.pos * self.playbackSpeed;
+					delay = (self.pos - startPos) * self.playbackSpeed;
 				}
 
 				self.timeouts.push(setTimeout(function (pos) {
