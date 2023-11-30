@@ -388,14 +388,16 @@
 		playFrame: function (self, frame, node) {
 			try {
 				if (frame[0] == 'm') {
-					let xoffset = 100;
+					//let xoffset = 100;
 					let left = document.scrollingElement.scrollLeft;
 					let top = document.scrollingElement.scrollTop;
-					node.style.left = (left + xoffset + self.getXCoordinate(frame[1])) + "px";
-					node.style.top = (top + self.getYCoordinate(frame[2])) + "px";
+					//node.style.left = (left + self.getXCoordinate(frame[1])) + "px";
+					//node.style.top = (top + self.getYCoordinate(frame[2])) + "px";
+					node.style.left = (left + frame[1]) + "px";
+					node.style.top = (top + frame[2]) + "px";
 
 				} else if (frame[0] == 'c') {
-					self.createClickSnapshot(frame[2], frame[1]);
+					self.createClickSnapshot(frame[1], frame[2]);
 					let element = self.getElementByXpath(frame[3]);
 					element.click();
 				} else if (frame[0] == 's') {
@@ -487,8 +489,8 @@
 			node.style.position = "absolute";
 			node.style.width = "32px";
 			node.style.height = "32px";
-			node.style.top = (x + top) + "px";
-			node.style.left = (y + left) + "px";
+			node.style.top = (y + top) + "px";
+			node.style.left = (x + left) + "px";
 			node.style.borderRadius = "32px";
 			node.style.backgroundColor = "red";
 			node.style.opacity = 0.2;
